@@ -1,2 +1,2 @@
 # GoSleepy
-An open source music DAW , made on golang with an emphasis on customization.
+An open source CAD , made on golang with an emphasis on customization.
