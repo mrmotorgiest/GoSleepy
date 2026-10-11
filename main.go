@@ -1,51 +1,66 @@
 package main
 
 import (
-	"image/color"
 	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
 func main() {
 	a := app.New()
-	w := a.NewWindow("GoSleepy")
+	a.Settings().SetTheme(theme.DarkTheme())
 
-	// Splash content
-	background := canvas.NewRectangle(color.Transparent)
+	// Splash screen
+	splash := a.NewWindow("Loading")
+	splash.Resize(fyne.NewSize(400, 220))
+	splash.SetFixedSize(true)
 
-	text := canvas.NewText("Loading GoSleepy...", color.White)
-	text.TextSize = 30
-	text.Alignment = fyne.TextAlignCenter
+	title := canvas.NewText("MY APPLICATION", theme.ForegroundColor())
+	title.TextSize = 24
+	title.TextStyle = fyne.TextStyle{Bold: true}
+	title.Alignment = fyne.TextAlignCenter
 
-	splashContent := container.NewMax(
-		background,
-		container.NewCenter(text),
+	subtitle := canvas.NewText("Initializing...", theme.ForegroundColor())
+	subtitle.TextSize = 13
+	subtitle.Alignment = fyne.TextAlignCenter
+
+	progress := widget.NewProgressBarInfinite()
+
+	content := container.NewCenter(
+		container.NewVBox(
+			title,
+			subtitle,
+			progress,
+		),
 	)
 
-	w.SetContent(splashContent)
-	w.SetFullScreen(true)
-	w.SetPadded(false)
-	w.Show()
+	splash.SetContent(content)
+	splash.CenterOnScreen()
 
+	// Main window
+	mainWindow := a.NewWindow("My Application")
+	mainWindow.Resize(fyne.NewSize(900, 600))
+	mainWindow.SetContent(
+		container.NewCenter(
+			widget.NewLabel("Welcome to my application!"),
+		),
+	)
+
+	// Show splash
+	splash.Show()
+
+	// Simulate initialization
 	go func() {
-		// Perform startup work here.
-		time.Sleep(2 * time.Second)
+		time.Sleep(3 * time.Second)
 
 		fyne.Do(func() {
-			// Replace the splash content in the same window.
-			mainContent := container.NewCenter(
-				widget.NewLabel("GoSleepy is ready!"),
-			)
-
-			w.SetContent(mainContent)
-			w.SetFullScreen(false)
-			w.Resize(fyne.NewSize(500, 300))
-			w.CenterOnScreen()
+			splash.Close()
+			mainWindow.Show()
 		})
 	}()
 
