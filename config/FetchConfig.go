@@ -1,18 +1,43 @@
 package config
 
 import (
-	"yaml"
+	"fmt"
+	"os"
+	"path/filepath"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	yaml "gopkg.in/yaml.v3"
 )
 
-var ConfigPath = "/home/user/.config/GoSleepy/main.yaml"
-func LoadConfig() (*Config, error) {
-	//placeholder
-	return nil, nil
+type UIConfig struct {
+	Theme        string `yaml:"theme"`
+	WindowWidth  int    `yaml:"window_width"`
+	WindowHeight int    `yaml:"window_height"`
+}
+
+func DefaultConfigPath() (string, error) {
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return "", fmt.Errorf("get user config directory: %w", err)
+	}
+	return filepath.Join(configDir, "GoSleepy", "main.yaml"), nil
+}
+
+func LoadConfig(path string) (UIConfig, error) {
+	var config UIConfig
+	if path == "" {
+		defaultPath, err := DefaultConfigPath()
+		if err != nil {
+			return config, err
+		}
+		path = defaultPath
+	}
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return config, fmt.Errorf("read config %q: %w", path, err)
+	}
+	if err := yaml.Unmarshal(data, &config); err != nil {
+		return config, fmt.Errorf("parse config %q: %w", path, err)
+	}
+	return config, nil
 }
