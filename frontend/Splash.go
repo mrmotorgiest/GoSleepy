@@ -2,25 +2,31 @@ package frontend
 
 import (
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"time"
 )
 
-func ShowSplashScreen(a fyne.App) {
-	splash := a.NewWindow("Initializing...")
-	splash.Resize(fyne.NewSize(220, 220))
+var ShowSplashScreen = func(a fyne.App) bool {
+	var splash = a.NewWindow("GoSleepy Splash")
 	splash.SetFixedSize(true)
-	title := canvas.NewText("GoSleepy", theme.ForegroundColor())
+	splash.Resize(fyne.NewSize(400, 400))
+
+	title := widget.NewLabel("GoSleepy")
+	title.Alignment = fyne.TextAlignCenter
 	title.TextStyle = fyne.TextStyle{Bold: true}
-	subtitle := canvas.NewText("Initializing...", theme.ForegroundColor())
-	progress := widget.NewProgressBarInfinite()
-	content := container.NewCenter(container.NewVBox(title, subtitle, progress))
+
+	subtitle := widget.NewLabel("Preparing your workspace")
+	subtitle.Alignment = fyne.TextAlignCenter
+
+	content := container.NewPadded(
+		container.NewVBox(title, subtitle),
+	)
 	splash.SetContent(content)
 	splash.CenterOnScreen()
+
 	splash.Show()
-	time.Sleep(2 * time.Second)
+	time.Sleep(time.Second * 3)
 	splash.Close()
+	return true
 }

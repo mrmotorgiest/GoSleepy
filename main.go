@@ -1,12 +1,15 @@
 package main
 
 import (
-	"main/frontend"
 	"fyne.io/fyne/v2/app"
+	"main/frontend"
 )
 
 func main() {
 	a := app.New()
-	frontend.ShowSplashScreen(a)
-	frontend.ShowMain(a)
+	var splashShown = frontend.ShowSplashScreen(a)
+	if splashShown {
+		frontend.ShowMain(a)
+	}
+	a.Run()
 }
