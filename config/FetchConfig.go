@@ -8,36 +8,28 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
+var DefaultConfigPath = filepath.Join(os.Getenv("HOME"), ".config", "GoSleepy", "main.yaml") 
 type UIConfig struct {
-	Theme        string `yaml:"theme"`
 	WindowWidth  int    `yaml:"window_width"`
 	WindowHeight int    `yaml:"window_height"`
+	Title        string `yaml:"title"`
 }
 
-func DefaultConfigPath() (string, error) {
-	configDir, err := os.UserConfigDir()
-	if err != nil {
-		return "", fmt.Errorf("get user config directory: %w", err)
-	}
-	return filepath.Join(configDir, "GoSleepy", "main.yaml"), nil
-}
-
-func LoadConfig(path string) (UIConfig, error) {
+func FetchConfig(path string) (UIConfig, error) {
 	var config UIConfig
 	if path == "" {
-		defaultPath, err := DefaultConfigPath()
-		if err != nil {
-			return config, err
-		}
-		path = defaultPath
+		path = DefaultConfigPath
 	}
 
-	data, err := os.ReadFile(path)
+	yamlFile, err := os.ReadFile(path)
 	if err != nil {
-		return config, fmt.Errorf("read config %q: %w", path, err)
+		return config, fmt.Errorf("failed to read config file: %w", err)
 	}
-	if err := yaml.Unmarshal(data, &config); err != nil {
-		return config, fmt.Errorf("parse config %q: %w", path, err)
+
+	err = yaml.Unmarshal(yamlFile, &config)
+	if err != nil {
+		return config, fmt.Errorf("failed to unmarshal config file: %w", err)
 	}
+	fmt.Println("Config loaded successfully from", path)
 	return config, nil
 }

@@ -2,27 +2,16 @@ package frontend
 
 import (
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
+	"fmt"
+	"main/config"
 )
 
-func ShowMain(a fyne.App) {
-	var splash = a.NewWindow("GoSleepy")
+func ShowMain(a fyne.App , config config.UIConfig) {
+	var splash = a.NewWindow(config.Title)
+	fmt.Println("Window Width:", config.WindowWidth)
+	fmt.Println("Window Height:", config.WindowHeight)
+	fmt.Println("Window Title:", config.Title)
 	splash.SetFixedSize(true)
-	splash.Resize(fyne.NewSize(1920, 1080))
-
-	title := widget.NewLabel("GoSleepy")
-	title.Alignment = fyne.TextAlignCenter
-	title.TextStyle = fyne.TextStyle{Bold: true}
-
-	subtitle := widget.NewLabel("Preparing your workspace")
-	subtitle.Alignment = fyne.TextAlignCenter
-
-	content := container.NewPadded(
-		container.NewVBox(title, subtitle),
-	)
-	splash.SetContent(content)
-	splash.CenterOnScreen()
-
+	splash.Resize(fyne.NewSize(float32(config.WindowWidth), float32(config.WindowHeight)))
 	splash.Show()
 }
