@@ -10,7 +10,7 @@ func main() {
 	a := app.New()
 	var splashShown = frontend.ShowSplashScreen(a)
 	if splashShown {
-		var config, err = config.FetchConfig("")
+		var config, err = config.DecodeConfig("main.yaml")
 		if err != nil {
 			panic(err)
 		}
