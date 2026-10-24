@@ -1,5 +1,4 @@
 package config
-
 import (
 	"fmt"
 	"os"
@@ -8,43 +7,41 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
-var DefaultConfigPath = filepath.Join(os.Getenv("HOME"), ".config", "GoSleepy") 
-type UIConfig struct {
-	WindowWidth  int    `yaml:"window_width"`
-	WindowHeight int    `yaml:"window_height"`
-	Title        string `yaml:"title"`
-
-	Register map[string]string `yaml:"register"`
-
-	MenuBar     MenuBar
+// Path \\
+func configFilePath(path string) string {
+	if filepath.IsAbs(path) {
+		return filepath.Clean(path)
+	}
+	return filepath.Join(DefaultConfigPath, path)
 }
 
-func FetchConfig(path string) (UIConfig , error) {
+// config \\
+func FetchConfig(path string) (UIConfig, error) {
 	var config UIConfig
-	fmt.Println("Fetching config from path:", path)
-	var ConfigPath = DefaultConfigPath + path
-
-	fmt.Println("Fetching config from:", ConfigPath)
-	yamlFile, err := os.ReadFile(ConfigPath)
-	if err != nil {
-		return config, fmt.Errorf("failed to read config file: %w", err)
-	}
+	
+	configPath := configFilePath(path)
+	yamlFile, err := os.ReadFile(configPath)
 	err = yaml.Unmarshal(yamlFile, &config)
 	if err != nil {
-		return config, fmt.Errorf("error while unmarshalling config file: %v", err)
+		return config, fmt.Errorf("Something went wrong with the YAML file %q: %w", configPath, err)
 	}
 
-	return config, nil
+	return config, err
 }
 
 func DecodeConfig(path string) (UIConfig, error) {
-	var config UIConfig
-	var err error
-	config, err = FetchConfig("main.yaml")
-	fmt.Println(config.Register["menu_bar"])
-	menuConfig, err := FetchConfig(string(config.Register["menu_bar"]))
+	config, err := FetchConfig(path)
+
+	menuPath, ok := config.Register["menu_bar"]
+	if !filepath.IsAbs(menuPath) {
+		menuPath = filepath.Join(filepath.Dir(configFilePath(path)), menuPath)
+	}
+
+	menuConfig, err := FetchConfig(menuPath)
 	config.MenuBar = menuConfig.MenuBar
 
-	fmt.Println("MenuBar Config:", config.MenuBar)
-	return config, err
+	if err != nil || !ok {
+		return config, fmt.Errorf("failed to load config %q: %w", menuPath, err)
+	}
+	return config, nil
 }

@@ -1,16 +1,31 @@
 package config
+import (
+	"os"
+	"path/filepath"
+)
 
+// Config \\
+var DefaultConfigPath = filepath.Join(os.Getenv("HOME"), ".config", "GoSleepy") 
+type UIConfig struct {
+	WindowWidth  int    `yaml:"window_width"`
+	WindowHeight int    `yaml:"window_height"`
+	Title        string `yaml:"title"`
+
+	Register map[string]string `yaml:"register"`
+	MenuBar  MenuBar           `yaml:"menu_bar"`
+}
+
+// Menu bar \\
 type MenuBar struct {
-	padding string `yaml:"padding"`
-	spacing string `yaml:"spacing"`
+	Padding string `yaml:"padding"`
+	Spacing string `yaml:"spacing"`
 
-	orentation string `yaml:"orientation"`
-
-	items []MenuItem `yaml:"items"`
+	Orientation string     `yaml:"orientation"`
+	Items       []MenuItem `yaml:"items"`
 }
 
 type MenuItem struct {
-	label string `yaml:"label"`
-	action string `yaml:"action"`
-	subitems []MenuItem `yaml:"subitems"`
+	Label    string     `yaml:"label"`
+	Action   string     `yaml:"action"`
+	Subitems []MenuItem `yaml:"subitems"`
 }

@@ -9,14 +9,13 @@ import (
 
 var ShowSplashScreen = func(a fyne.App) bool {
 	var splash = a.NewWindow("GoSleepy Splash")
-	splash.SetFixedSize(true)
 	splash.Resize(fyne.NewSize(400, 400))
 
 	title := widget.NewLabel("GoSleepy")
 	title.Alignment = fyne.TextAlignCenter
 	title.TextStyle = fyne.TextStyle{Bold: true}
 
-	subtitle := widget.NewLabel("Preparing your workspace")
+	subtitle := widget.NewLabel("Currently in deving")
 	subtitle.Alignment = fyne.TextAlignCenter
 
 	content := container.NewPadded(
@@ -26,7 +25,7 @@ var ShowSplashScreen = func(a fyne.App) bool {
 	splash.CenterOnScreen()
 
 	splash.Show()
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Second * 1)
 	splash.Close()
 	return true
 }
