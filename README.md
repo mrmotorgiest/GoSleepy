@@ -2,6 +2,7 @@
 An open source music software , made on golang with an emphasis on customization.
 
 # Build instructions
+To build you just need the latest version of golang and then run ```go run .``` from the directory.
 
 ## Hyprland
 

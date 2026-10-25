@@ -1,4 +1,5 @@
 package config
+
 import (
 	"fmt"
 	"os"
@@ -15,10 +16,17 @@ func configFilePath(path string) string {
 	return filepath.Join(DefaultConfigPath, path)
 }
 
+func resolveConfigRelativePath(configPath, targetPath string) string {
+	if filepath.IsAbs(targetPath) {
+		return filepath.Clean(targetPath)
+	}
+	return filepath.Join(filepath.Dir(configPath), targetPath)
+}
+
 // config \\
 func FetchConfig(path string) (UIConfig, error) {
 	var config UIConfig
-	
+
 	configPath := configFilePath(path)
 	yamlFile, err := os.ReadFile(configPath)
 	err = yaml.Unmarshal(yamlFile, &config)
@@ -31,10 +39,13 @@ func FetchConfig(path string) (UIConfig, error) {
 
 func DecodeConfig(path string) (UIConfig, error) {
 	config, err := FetchConfig(path)
+	if config.Font.Main.Path != "" {
+		config.Font.Main.Path = resolveConfigRelativePath(configFilePath(path), config.Font.Main.Path)
+	}
 
 	menuPath, ok := config.Register["menu_bar"]
 	if !filepath.IsAbs(menuPath) {
-		menuPath = filepath.Join(filepath.Dir(configFilePath(path)), menuPath)
+		menuPath = resolveConfigRelativePath(configFilePath(path), menuPath)
 	}
 
 	menuConfig, err := FetchConfig(menuPath)

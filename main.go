@@ -2,8 +2,8 @@ package main
 
 import (
 	"fyne.io/fyne/v2/app"
-	"main/frontend"
 	"main/config"
+	"main/frontend"
 )
 
 func main() {
@@ -14,7 +14,9 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		frontend.ShowMain(a, config)
+		if err := frontend.ShowMain(a, config); err != nil {
+			panic(err)
+		}
 	}
 	a.Run()
 }
