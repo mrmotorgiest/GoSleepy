@@ -1,0 +1,10 @@
+package layout
+
+import (
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/container"
+)
+
+func BuildContent(objects ...fyne.CanvasObject) fyne.CanvasObject {
+	return container.NewVBox(objects...)
+}

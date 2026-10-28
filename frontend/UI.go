@@ -1,34 +1,39 @@
 package frontend
-
 import (
 	"fmt"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
-
 	"main/config"
 	"main/frontend/layout"
 	"main/frontend/style"
 )
 
-func ShowMain(a fyne.App, config config.UIConfig) error {
-	if err := style.SetFontTheme(a, style.FontConfig{
-		Path: config.Font.Main.Path,
-		Size: config.Font.Main.Size,
+// UI \\
+func ShowMain(app fyne.App, uiConfig config.UIConfig) error {
+	if err := style.SetFontTheme(app, style.FontConfig{
+		Path: uiConfig.Font.Main.Path,
+		Size: uiConfig.Font.Main.Size,
 	}); err != nil {
 		return fmt.Errorf("set font theme: %w", err)
 	}
 
-	window := a.NewWindow(config.Title)
-	window.Resize(fyne.NewSize(float32(config.WindowWidth), float32(config.WindowHeight)))
-
-	window.SetMainMenu(BuildMain(config.MenuBar.Items))
-	window.Show()
+	BuildUI(app, &uiConfig)
 	return nil
 }
 
-func BuildMain(items []config.MenuItem) *fyne.MainMenu {
+func BuildUI(app fyne.App, uiConfig *config.UIConfig, content ...fyne.CanvasObject) fyne.Window {
+	window := app.NewWindow(uiConfig.Title)
+	window.Resize(fyne.NewSize(float32(uiConfig.WindowWidth), float32(uiConfig.WindowHeight)))
+	
+	window.SetMainMenu(BuildMainMenu(uiConfig.MenuBar.Items))
+	window.SetContent(layout.BuildContent(content...))
+
+	window.Show()
+	return window
+}
+
+// Items \\
+func BuildMainMenu(items []config.MenuItem) *fyne.MainMenu {
 	menus := make([]*fyne.Menu, 0, len(items))
 	for _, item := range items {
 		menus = append(menus, fyne.NewMenu(item.Label, layout.BuildMenuItems(item.Subitems)...))

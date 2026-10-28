@@ -1,21 +1,22 @@
 package frontend
 
 import (
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	"time"
 )
 
-var ShowSplashScreen = func(a fyne.App) bool {
-	var splash = a.NewWindow("GoSleepy Splash")
+func ShowSplashScreen(app fyne.App) {
+	splash := app.NewWindow("GoSleepy Splash")
 	splash.Resize(fyne.NewSize(400, 400))
 
 	title := widget.NewLabel("GoSleepy")
 	title.Alignment = fyne.TextAlignCenter
 	title.TextStyle = fyne.TextStyle{Bold: true}
 
-	subtitle := widget.NewLabel("Currently in deving")
+	subtitle := widget.NewLabel("In development")
 	subtitle.Alignment = fyne.TextAlignCenter
 
 	content := container.NewPadded(
@@ -25,7 +26,7 @@ var ShowSplashScreen = func(a fyne.App) bool {
 	splash.CenterOnScreen()
 
 	splash.Show()
-	time.Sleep(time.Second * 1)
-	splash.Close()
-	return true
+	time.AfterFunc(time.Second, func() {
+		fyne.Do(splash.Close)
+	})
 }

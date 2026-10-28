@@ -18,15 +18,6 @@ type UIConfig struct {
 	MenuBar  MenuBar           `yaml:"menu_bar"`
 }
 
-type FontConfig struct {
-	Main FontFaceConfig `yaml:"main"`
-}
-
-type FontFaceConfig struct {
-	Path string  `yaml:"path"`
-	Size float32 `yaml:"size"`
-}
-
 // Menu bar \\
 type MenuBar struct {
 	Padding string `yaml:"padding"`
@@ -40,4 +31,14 @@ type MenuItem struct {
 	Label    string     `yaml:"label"`
 	Action   string     `yaml:"action"`
 	Subitems []MenuItem `yaml:"subitems"`
+}
+
+// Font \\
+type FontConfig struct {
+	Main FontFaceConfig `yaml:"main"`
+}
+
+type FontFaceConfig struct {
+	Path string  `yaml:"path"`
+	Size float32 `yaml:"size"`
 }
