@@ -29,30 +29,42 @@ func FetchConfig(path string) (UIConfig, error) {
 
 	configPath := configFilePath(path)
 	yamlFile, err := os.ReadFile(configPath)
-	err = yaml.Unmarshal(yamlFile, &config)
 	if err != nil {
-		return config, fmt.Errorf("Something went wrong with the YAML file %q: %w", configPath, err)
+		return config, fmt.Errorf("read config %q: %w", configPath, err)
+	}
+	if err := yaml.Unmarshal(yamlFile, &config); err != nil {
+		return config, fmt.Errorf("decode config %q: %w", configPath, err)
 	}
 
-	return config, err
+	return config, nil
 }
 
 func DecodeConfig(path string) (UIConfig, error) {
 	config, err := FetchConfig(path)
+	config.Components = make(map[string]Component)
+	mainConfigPath := configFilePath(path)
 	if config.Font.Main.Path != "" {
-		config.Font.Main.Path = resolveConfigRelativePath(configFilePath(path), config.Font.Main.Path)
+		config.Font.Main.Path = resolveConfigRelativePath(mainConfigPath, config.Font.Main.Path)
 	}
 
-	menuPath, ok := config.Register["menu_bar"]
-	if !filepath.IsAbs(menuPath) {
-		menuPath = resolveConfigRelativePath(configFilePath(path), menuPath)
+	for _, registeredPath := range config.Register {
+		registeredConfigPath := resolveConfigRelativePath(mainConfigPath, registeredPath)
+		registeredFile, err := os.ReadFile(registeredConfigPath)
+		var registered map[string]yaml.Node
+		for name, node := range registered {
+			if name == "menu_bar" {
+				continue
+			}
+
+			var component Component
+			if component.CSSPath != "" {
+				component.CSSPath = resolveConfigRelativePath(mainConfigPath, component.CSSPath)
+			}
+			config.Components[name] = component
+		}
 	}
-
-	menuConfig, err := FetchConfig(menuPath)
-	config.MenuBar = menuConfig.MenuBar
-
-	if err != nil || !ok {
-		return config, fmt.Errorf("failed to load config %q: %w", menuPath, err)
+	if err != nil {
+		return config, err
 	}
 	return config, nil
 }

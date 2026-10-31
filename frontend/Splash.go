@@ -1,5 +1,4 @@
 package frontend
-
 import (
 	"time"
 
@@ -8,6 +7,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+// still an placeholder
 func ShowSplashScreen(app fyne.App) {
 	splash := app.NewWindow("GoSleepy Splash")
 	splash.Resize(fyne.NewSize(400, 400))

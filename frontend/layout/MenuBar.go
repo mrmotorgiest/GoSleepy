@@ -1,5 +1,4 @@
 package layout
-
 import (
 	"fyne.io/fyne/v2"
 	"main/config"

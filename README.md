@@ -1,8 +1,10 @@
 # GoSleepy
 An open source music software , made on golang with an emphasis on customization.
+Made by MrMotorgiest in 2026.
 
 # Build instructions
 To build you just need the latest version of golang and then run ```go run .``` from the directory.
+Im not sure if the code works on windows tho.
 
 ## Hyprland
 

@@ -1,5 +1,4 @@
 package style
-
 import (
 	"fmt"
 	"os"
@@ -8,19 +7,20 @@ import (
 	"fyne.io/fyne/v2/theme"
 )
 
+// stucts \\
 type FontConfig struct {
 	Path string
 	Size float32
 }
 
+func (t fontTheme) Font(fyne.TextStyle) fyne.Resource { return t.font }
 type fontTheme struct {
 	fyne.Theme
 	font fyne.Resource
 	size float32
 }
 
-func (t fontTheme) Font(fyne.TextStyle) fyne.Resource { return t.font }
-
+// font \\
 func (t fontTheme) Size(name fyne.ThemeSizeName) float32 {
 	if name == theme.SizeNameText && t.size > 0 {
 		return t.size

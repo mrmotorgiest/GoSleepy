@@ -1,4 +1,5 @@
 package frontend
+
 import (
 	"fmt"
 
@@ -16,6 +17,11 @@ func ShowMain(app fyne.App, uiConfig config.UIConfig) error {
 	}); err != nil {
 		return fmt.Errorf("set font theme: %w", err)
 	}
+	for name, component := range uiConfig.Components {
+		if err := style.LoadCSS(component.CSSPath); err != nil {
+			return fmt.Errorf("load CSS for %q: %w", name, err)
+		}
+	}
 
 	BuildUI(app, &uiConfig)
 	return nil
@@ -24,9 +30,9 @@ func ShowMain(app fyne.App, uiConfig config.UIConfig) error {
 func BuildUI(app fyne.App, uiConfig *config.UIConfig, content ...fyne.CanvasObject) fyne.Window {
 	window := app.NewWindow(uiConfig.Title)
 	window.Resize(fyne.NewSize(float32(uiConfig.WindowWidth), float32(uiConfig.WindowHeight)))
-	
+
 	window.SetMainMenu(BuildMainMenu(uiConfig.MenuBar.Items))
-	window.SetContent(layout.BuildContent(content...))
+	window.SetContent(layout.BuildContent(uiConfig.Components, content...))
 
 	window.Show()
 	return window
