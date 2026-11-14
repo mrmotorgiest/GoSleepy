@@ -1,22 +1,26 @@
 package config
-
 import (
+	"io/ioutil"
+	"os"
 	"path/filepath"
+	"fmt"
 )
 
 // Path \\
-func configFilePath(path string) string {
-	if filepath.IsAbs(path) {
-		return filepath.Clean(path)
-	}
-	return filepath.Join(DefaultConfigPath, path)
-}
-
-func resolveConfigRelativePath(configPath, targetPath string) string {
-	if filepath.IsAbs(targetPath) {
-		return filepath.Clean(targetPath)
-	}
-	return filepath.Join(filepath.Dir(configPath), targetPath)
-}
 
 // config \\
+func FetchConfig(path string) SConfig {
+	var config SConfig
+	if path == "DEFAULT" {
+		path = filepath.Join(os.Getenv("HOME"), ".config", "GoSleepy")
+	}
+
+	data, err := ioutil.ReadFile(path + "/main.gsc")
+	if err != nil {
+		panic(err)
+	}
+	//pring out data
+	fmt.Println(string(data))
+
+	return config
+}

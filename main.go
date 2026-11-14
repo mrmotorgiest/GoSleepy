@@ -1,10 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"fyne.io/fyne/v2/app"
-	"main/frontend"
+	"main/config"
 )
 
 func main() {
@@ -15,6 +16,7 @@ func main() {
 	os.Setenv("XDG_BACKEND", "x11")
 
 	a := app.New()
-	frontend.ShowSplashScreen(a)
+	config := config.FetchConfig("DEFAULT")
+	fmt.Println(config)
 	a.Run()
 }
