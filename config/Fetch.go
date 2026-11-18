@@ -6,7 +6,6 @@ import (
 )
 
 func FetchConfig(path string) decode.DConfig {
-	var config decode.DConfig
 	if path == "DEFAULT" {
 		path = filepath.Join(os.Getenv("HOME"), ".config", "GoSleepy")
 	}
@@ -16,7 +15,6 @@ func FetchConfig(path string) decode.DConfig {
 	if err != nil {
 		panic(err)
 	}
-	config = decode.DecodeFile(mainPath)
 
-	return config
+	return decode.DecodeFile(mainPath)
 }

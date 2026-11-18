@@ -6,6 +6,7 @@ import (
 
 	"fyne.io/fyne/v2/app"
 	"main/config"
+	"main/config/debug"
 )
 
 func main() {
@@ -17,6 +18,7 @@ func main() {
 
 	a := app.New()
 	config := config.FetchConfig("DEFAULT")
-	fmt.Println(config)
+	debug.PrintConfig(config)
+	fmt.Println("int3:", config.Root.SubPackages["something"].Variables["int3"])
 	a.Run()
 }

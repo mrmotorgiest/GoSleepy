@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+//longgg shiieet
 var includeBlockPattern = regexp.MustCompile(`(?s)\$include\s*\{([^}]*)\}`)
 var includeStringPattern = regexp.MustCompile(`"((?:\\.|[^"\\])*)"|'((?:\\.|[^'\\])*)'`)
 
@@ -68,8 +69,7 @@ func loadFile(path, rootPath string, config *DConfig, loaded map[string]bool) {
 			packageParts = packageParts[1:]
 		}
 		packageParts = append(packageParts, strings.TrimSuffix(filepath.Base(path), ".gsc.package"))
-		pkg := ensurePackage(&config.Packages, packageParts)
-		parseSource(cleanSource, &pkg)
+		parsePackageSource(config.Packages, packageParts, cleanSource)
 		return
 	}
 	parseSource(cleanSource, &config.Root)

@@ -1,4 +1,5 @@
 package decode
+
 import (
 	"fmt"
 	"sort"
@@ -25,14 +26,6 @@ func writePackage(builder *strings.Builder, pkg DPackage, indent string) {
 	}
 }
 
-func packageAt(target *DPackage, parts []string) *DPackage {
-	if len(parts) == 0 {
-		return target
-	}
-	child := target.SubPackages[parts[0]]
-	return packageAt(&child, parts[1:])
-}
-
 func ensureSubPackage(target *DPackage, parts []string) {
 	if len(parts) == 0 {
 		return
@@ -48,25 +41,35 @@ func ensureSubPackage(target *DPackage, parts []string) {
 	target.SubPackages[name] = child
 }
 
-func ensurePackage(packages *map[string]DPackage, parts []string) DPackage {
+func setPackageVariable(target *DPackage, parts []string, key string, value any) {
 	if len(parts) == 0 {
-		return newDPackage()
+		target.Variables[key] = value
+		return
 	}
-	current := *packages
 	name := parts[0]
-	pkg, ok := current[name]
+	child, ok := target.SubPackages[name]
+	if !ok {
+		child = newDPackage()
+	}
+	setPackageVariable(&child, parts[1:], key, value)
+	target.SubPackages[name] = child
+}
+
+func parsePackageSource(packages map[string]DPackage, parts []string, source string) {
+	if len(parts) == 0 {
+		return
+	}
+	name := parts[0]
+	pkg, ok := packages[name]
 	if !ok {
 		pkg = newDPackage()
 	}
-	if len(parts) > 1 {
-		children := pkg.SubPackages
-		leaf := ensurePackage(&children, parts[1:])
-		_ = leaf
-		pkg.SubPackages = children
+	if len(parts) == 1 {
+		parseSource(source, &pkg)
+	} else {
+		parsePackageSource(pkg.SubPackages, parts[1:], source)
 	}
-	current[name] = pkg
-	*packages = current
-	return pkg
+	packages[name] = pkg
 }
 
 func newDPackage() DPackage {

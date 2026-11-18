@@ -4,30 +4,36 @@ import (
 	"strconv"
 )
 
+// cleans files
 func stripComment(line string) string {
 	quoted := rune(0)
 	escaped := false
 	for index, char := range line {
-		if escaped {
-			escaped = false
-			continue
-		}
-		if char == '\\' && quoted != 0 {
-			escaped = true
-			continue
-		}
+		switch char {
+			case '"', '\'':
+				if !escaped {
+					if quoted == 0 {
+						quoted = char
+					} else if quoted == char {
+						quoted = 0
+					}
+				}
+			case '\\':
+				if quoted != 0 {
+					escaped = !escaped
+				}
+			case '/':
+				if !escaped && quoted == 0 && strings.HasPrefix(line[index:], "//") {
+					return line[:index]
+				}
+			default:
+				escaped = false
+			}
 		if quoted != 0 {
 			if char == quoted {
 				quoted = 0
 			}
 			continue
-		}
-		if char == '"' || char == '\'' {
-			quoted = char
-			continue
-		}
-		if char == '/' && strings.HasPrefix(line[index:], "//") {
-			return line[:index]
 		}
 	}
 	return line
