@@ -1,9 +1,10 @@
 package decode
+
 import (
 	"strings"
 )
 
-func splitValues(value string) []string {
+func SplitValues(value string) []string {
 	var parts []string
 	start := 0
 	quoted := rune(0)
@@ -32,7 +33,7 @@ func splitValues(value string) []string {
 	return append(parts, strings.TrimSpace(value[start:]))
 }
 
-func splitAssignment(line string) (string, string, bool) {
+func SplitAssignment(line string) (string, string, bool) {
 	quoted := rune(0)
 	for index, char := range line {
 		if quoted != 0 {
@@ -52,7 +53,7 @@ func splitAssignment(line string) (string, string, bool) {
 	return "", "", false
 }
 
-func parseAssignmentValue(value, declaredType string) any {
+func ParseAssignmentValue(value, declaredType string) any {
 	if declaredType == "bool" {
 		if value == "1" {
 			return true
@@ -61,10 +62,10 @@ func parseAssignmentValue(value, declaredType string) any {
 			return false
 		}
 	}
-	return parseValue(value)
+	return ParseValue(value)
 }
 
-func variableType(name string) string {
+func VariableType(name string) string {
 	start := strings.Index(name, "<")
 	end := strings.LastIndex(name, ">")
 	if start < 0 || end <= start {
@@ -73,11 +74,10 @@ func variableType(name string) string {
 	return strings.TrimSpace(name[start+1 : end])
 }
 
-func variableName(name string) string {
+func VariableName(name string) string {
 	name = strings.TrimSpace(name)
 	if index := strings.Index(name, "<"); index >= 0 {
 		name = name[:index]
 	}
 	return strings.TrimSpace(name)
 }
-

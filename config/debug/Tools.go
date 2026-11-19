@@ -12,7 +12,7 @@ import (
 func PrintConfig(config decode.DConfig) {
 	var builder strings.Builder
 	builder.WriteString("root\n")
-	writePackage(&builder, config.Root, "  ")
+	WritePackage(&builder, config.Root, "  ")
 	packageNames := make([]string, 0, len(config.Packages))
 	for name := range config.Packages {
 		packageNames = append(packageNames, name)
@@ -20,7 +20,7 @@ func PrintConfig(config decode.DConfig) {
 	sort.Strings(packageNames)
 	for _, name := range packageNames {
 		fmt.Fprintf(&builder, "package %s\n", name)
-		writePackage(&builder, config.Packages[name], "  ")
+		WritePackage(&builder, config.Packages[name], "  ")
 	}
 	for _, err := range config.Errors {
 		fmt.Fprintf(&builder, "error: %s\n", err)
@@ -28,7 +28,7 @@ func PrintConfig(config decode.DConfig) {
 	fmt.Print(strings.TrimRight(builder.String(), "\n"))
 }
 
-func writePackage(builder *strings.Builder, pkg decode.DPackage, indent string) {
+func WritePackage(builder *strings.Builder, pkg decode.DPackage, indent string) {
 	variableNames := make([]string, 0, len(pkg.Variables))
 	for name := range pkg.Variables {
 		variableNames = append(variableNames, name)
@@ -45,6 +45,6 @@ func writePackage(builder *strings.Builder, pkg decode.DPackage, indent string) 
 	sort.Strings(packageNames)
 	for _, name := range packageNames {
 		fmt.Fprintf(builder, "%s%s\n", indent, name)
-		writePackage(builder, pkg.SubPackages[name], indent+"  ")
+		WritePackage(builder, pkg.SubPackages[name], indent+"  ")
 	}
 }

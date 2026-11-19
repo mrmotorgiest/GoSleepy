@@ -1,34 +1,35 @@
 package decode
+
 import (
-	"strings"
 	"strconv"
+	"strings"
 )
 
 // cleans files
-func stripComment(line string) string {
+func StripComment(line string) string {
 	quoted := rune(0)
 	escaped := false
 	for index, char := range line {
 		switch char {
-			case '"', '\'':
-				if !escaped {
-					if quoted == 0 {
-						quoted = char
-					} else if quoted == char {
-						quoted = 0
-					}
+		case '"', '\'':
+			if !escaped {
+				if quoted == 0 {
+					quoted = char
+				} else if quoted == char {
+					quoted = 0
 				}
-			case '\\':
-				if quoted != 0 {
-					escaped = !escaped
-				}
-			case '/':
-				if !escaped && quoted == 0 && strings.HasPrefix(line[index:], "//") {
-					return line[:index]
-				}
-			default:
-				escaped = false
 			}
+		case '\\':
+			if quoted != 0 {
+				escaped = !escaped
+			}
+		case '/':
+			if !escaped && quoted == 0 && strings.HasPrefix(line[index:], "//") {
+				return line[:index]
+			}
+		default:
+			escaped = false
+		}
 		if quoted != 0 {
 			if char == quoted {
 				quoted = 0
@@ -39,17 +40,17 @@ func stripComment(line string) string {
 	return line
 }
 
-func parseValue(value string) any {
+func ParseValue(value string) any {
 	value = strings.TrimSpace(strings.TrimSuffix(value, ";"))
 	if len(value) >= 2 && value[0] == '{' && value[len(value)-1] == '}' {
 		value = strings.TrimSpace(value[1 : len(value)-1])
 		if value == "" {
 			return []any{}
 		}
-		parts := splitValues(value)
+		parts := SplitValues(value)
 		values := make([]any, 0, len(parts))
 		for _, part := range parts {
-			values = append(values, parseValue(part))
+			values = append(values, ParseValue(part))
 		}
 		return values
 	}
@@ -65,7 +66,6 @@ func parseValue(value string) any {
 	}
 	if value == "true" {
 		return true
-
 	}
 	if value == "false" {
 		return false
@@ -76,23 +76,20 @@ func parseValue(value string) any {
 	if number, err := strconv.ParseFloat(value, 64); err == nil {
 		return number
 	}
-	parts := splitValues(value)
+	parts := SplitValues(value)
 	if len(parts) > 1 {
 		values := make([]any, 0, len(parts))
 		for _, part := range parts {
-			values = append(values, parseValue(part))
+			values = append(values, ParseValue(part))
 		}
 		return values
 	}
 	return value
 }
 
-
-
-func blockName(name string) string {
+func BlockName(name string) string {
 	if index := strings.IndexAny(name, "(<"); index >= 0 {
 		name = name[:index]
 	}
 	return strings.Trim(strings.TrimSpace(name), ".")
 }
-
