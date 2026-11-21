@@ -15,7 +15,7 @@ var InString = regexp.MustCompile(`"((?:\\.|[^"\\])*)"|'((?:\\.|[^'\\])*)'`)
 
 // including of raw individualy \\
 func LoadFile(path string, config *DConfig) {
-	data, err := os.ReadFile(path)
+	var data, err = os.ReadFile(path)
 	errors.ReceiveError(err, "LoadFile: os.ReadFile")
 
 	var source = string(data)
@@ -42,7 +42,7 @@ func LoadFile(path string, config *DConfig) {
 
 		if packageParts[0] == "." {
 			packageParts = packageParts[1:]
-		}else if len(packageParts) > 0 && packageParts[0] == "packages" {
+		} else if len(packageParts) > 0 && packageParts[0] == "packages" {
 			packageParts = packageParts[1:]
 		}
 

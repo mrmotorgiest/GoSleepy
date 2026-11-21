@@ -1,5 +1,4 @@
 package decode
-
 import (
 	"path/filepath"
 	"strings"
@@ -28,10 +27,9 @@ func ParseSource(source string, target *DPackage) {
 		}
 
 		switch {
-		case line == "}":
-			if len(sectionPath) > 0 {
-				sectionPath = sectionPath[:len(sectionPath)-1]
-			}
+		case line == "}" && len(sectionPath) > 0:
+			sectionPath = sectionPath[:len(sectionPath)-1]
+			
 		case strings.HasSuffix(line, "{"):
 			var name = strings.TrimSuffix(line, "{")
 			name = BlockName(strings.TrimSpace(name))

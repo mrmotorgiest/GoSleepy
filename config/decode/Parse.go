@@ -1,95 +1,56 @@
 package decode
-
 import (
-	"strconv"
 	"strings"
 )
 
-// cleans files
+// cleanup
 func StripComment(line string) string {
-	quoted := rune(0)
-	escaped := false
+	var quoted = rune(0)
+	var escaped = false
+	
 	for index, char := range line {
 		switch char {
-		case '"', '\'':
-			if !escaped {
+			case '"', '\'' :
+				if escaped { continue }
+
 				if quoted == 0 {
 					quoted = char
 				} else if quoted == char {
 					quoted = 0
 				}
-			}
-		case '\\':
-			if quoted != 0 {
-				escaped = !escaped
-			}
-		case '/':
-			if !escaped && quoted == 0 && strings.HasPrefix(line[index:], "//") {
-				return line[:index]
-			}
-		default:
-			escaped = false
+			case '\\':
+				if quoted != 0 {
+					escaped = !escaped
+				}
+			case '/':
+				if !escaped && quoted == 0 && strings.HasPrefix(line[index:], "//") {
+					return line[:index]
+				}
+			default:
+				escaped = false
 		}
-		if quoted != 0 {
-			if char == quoted {
-				quoted = 0
-			}
-			continue
+		if quoted != 0 && char == quoted {
+			quoted = 0
 		}
 	}
 	return line
 }
 
-func ParseValue(value string) any {
-	value = strings.TrimSpace(strings.TrimSuffix(value, ";"))
-	if len(value) >= 2 && value[0] == '{' && value[len(value)-1] == '}' {
-		value = strings.TrimSpace(value[1 : len(value)-1])
-		if value == "" {
-			return []any{}
-		}
-		parts := SplitValues(value)
-		values := make([]any, 0, len(parts))
-		for _, part := range parts {
-			values = append(values, ParseValue(part))
-		}
-		return values
+// misc
+func ConvertString(file string) RawConfig {
+	var lines = strings.Split(file, "\n")
+	var config = make(RawConfig, 0, len(lines))
+	
+	for index, line := range lines {
+		config = append(config, RawLine{Content: strings.TrimSuffix(line, "\r"), LineNumber: index + 1})
 	}
-	if len(value) >= 2 && value[0] == '"' && value[len(value)-1] == '"' {
-		if unquoted, err := strconv.Unquote(value); err == nil {
-			return unquoted
-		}
-	}
-	if len(value) >= 2 && value[0] == '\'' && value[len(value)-1] == '\'' {
-		if unquoted, err := strconv.Unquote(value); err == nil {
-			return string(unquoted)
-		}
-	}
-	if value == "true" {
-		return true
-	}
-	if value == "false" {
-		return false
-	}
-	if integer, err := strconv.ParseInt(value, 0, 64); err == nil {
-		return integer
-	}
-	if number, err := strconv.ParseFloat(value, 64); err == nil {
-		return number
-	}
-	parts := SplitValues(value)
-	if len(parts) > 1 {
-		values := make([]any, 0, len(parts))
-		for _, part := range parts {
-			values = append(values, ParseValue(part))
-		}
-		return values
-	}
-	return value
+	return config
 }
 
 func BlockName(name string) string {
-	if index := strings.IndexAny(name, "(<"); index >= 0 {
-		name = name[:index]
+	var index = strings.IndexAny(name, "(<") 
+	if index >= 0 { 
+		name = name[:index] 
 	}
 	return strings.Trim(strings.TrimSpace(name), ".")
 }

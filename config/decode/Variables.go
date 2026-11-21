@@ -1,8 +1,54 @@
 package decode
-
 import (
 	"strings"
+	"strconv"
 )
+
+// main parser for values everything else is helper
+func ParseValue(value string) any {
+	value = strings.TrimSpace(strings.TrimSuffix(value, ";"))
+
+	parseParts := func(parts []string) []any {
+		values := make([]any, 0, len(parts))
+		for _, part := range parts {
+			values = append(values, ParseValue(part))
+		}
+		return values
+	}
+
+	if len(value) >= 2 && value[0] == '{' && value[len(value)-1] == '}' {
+		value = strings.TrimSpace(value[1 : len(value)-1])
+		if value == "" {
+			return []any{}
+		}
+		return parseParts(SplitValues(value))
+	}
+
+	if len(value) >= 2 && (value[0] == '"' || value[0] == '\'') && value[len(value)-1] == value[0] {
+		if unquoted, err := strconv.Unquote(value); err == nil {
+			return unquoted
+		}
+	}
+
+	if value == "true" || value == "false" {
+		return value == "true"
+	}
+
+	if integer, err := strconv.ParseInt(value, 0, 64); err == nil {
+		return integer
+	}
+
+	if number, err := strconv.ParseFloat(value, 64); err == nil {
+		return number
+	}
+
+	if parts := SplitValues(value); len(parts) > 1 {
+		return parseParts(parts)
+	}
+
+	return value
+}
+
 
 func SplitValues(value string) []string {
 	var parts []string
@@ -53,7 +99,7 @@ func SplitAssignment(line string) (string, string, bool) {
 	return "", "", false
 }
 
-func ParseAssignmentValue(value, declaredType string) any {
+func ParseAssignmentValue(value, declaredType string) any {//currently only used for bools
 	if declaredType == "bool" {
 		if value == "1" {
 			return true
@@ -72,12 +118,4 @@ func VariableType(name string) string {
 		return ""
 	}
 	return strings.TrimSpace(name[start+1 : end])
-}
-
-func VariableName(name string) string {
-	name = strings.TrimSpace(name)
-	if index := strings.Index(name, "<"); index >= 0 {
-		name = name[:index]
-	}
-	return strings.TrimSpace(name)
 }
